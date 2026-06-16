@@ -553,24 +553,16 @@ public class ServiceImpl implements ProjectService {
 
     @Override
     public ProjectDto save(ProjectDto b) throws ProjectExistException {
-        // ⚠️ Ispravka: provera treba da bude po nazivu, ne po ID-u.
-        // U originalnom kodu: if(b.getIdprojekat()!=null) – to nije ispravno.
-        // Ispravno: proveriti da li u bazi vec postoji projekat sa istim nazivom.
-        // Ovde je prikazana korektna logika (repo bi trebalo da ima findByNaziv metodu):
-        if (b.getIdprojekat() != null) {
-            throw new ProjectExistException("Projekat sa ovim nazivom vec postoji.");
-        }
-        Project p = conv.toEntity(b);
+       Project p= conv.toEntity(b);
+        if(p.getNaziv() == null || b.getIdprojekat()!=null ) throw new ProjectExistException("Projekat postoji");
         repo.save(p);
         return b;
     }
 
     @Override
     public void delete(ProjectDto b) throws ProjectDoesNotExistException {
-        if (b == null || b.getIdprojekat() == null) {
-            throw new ProjectDoesNotExistException("Projekat ne postoji.");
-        }
-        Project p = conv.toEntity(b);
+       Project p= conv.toEntity(b);
+        if(p==null || p.getIdprojekat()==null) throw new ProjectDoesNotExistException("Projekat ne postoji");
         repo.delete(p);
     }
 }
