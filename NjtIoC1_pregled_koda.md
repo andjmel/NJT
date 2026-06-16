@@ -495,4 +495,4 @@ private String sifra;
 
 ```
 
-**Kada bi svaki pacijent imao svoj nalog:** Struktura projekta je solidna, DI je ispravno primenjen, i jasno je da razumeš kako Spring IoC funkcioniše. Ključna greška je u logici `delete` u servisu (uvek baca exception) i izostavljanje `opis` iz konvertera. Sve ostalo su sitne napomene.
+**Kada bi svaki pacijent imao svoj nalog:** A u nasem primeru nullable=true jer nema svaki svoj nalog; i onda kolona pacijent bi uvek morala da se prosledi pregledu.
