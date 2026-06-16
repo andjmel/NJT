@@ -485,30 +485,14 @@ public void delete(MedicalExaminationDto e) throws MedicalExaminationDoesNotExis
     MedicalExamination entity = conv.toEntity(e);
     repo.delete(entity);
 }
-```
-Tada bi repozitorijum (posebno JpaRepo) bio zadužen da proveri `if (toRemove != null)` – što već radi ispravno.
 
-### 2. `JpaRepo.save()` koristi `merge` umesto `persist`
-`em.merge(e)` je OK za update, ali za novi entitet koji ima `idpregled` već postavljen ručno (kao u main-u: `me.setIdpregled(1L)`) može da napravi problem – JPA će pokušati update reda koji možda ne postoji. Bolje rešenje bi bilo da se `idpregled` ne setuje ručno, ili da se eksplicitno koristi `persist` za nove entitete i `merge` za update.
 
-### 3. `Pacijent` nema polje `korisnickoime` / `sifra`
-Zadatak kaže da pacijent pristupa sistemu **preko korisničkog naloga** (korisničko ime i šifra), a u zahtevu 1 piše "Ne svaki pacijent otvorenom korisničkim nalog". To znači da ta polja treba da postoje, ali mogu biti `null`. Trenutni `Pacijent` entitet ih nema.
+@Column(nullable = false, unique = true)
+private String korisnickoime;
 
-### 4. `Ioc.java` u DiRandom projektu nema `@Configuration`
-Klasa `Ioc` ima `@ComponentScan` ali nema `@Configuration` anotaciju. Tehnički Spring će je obraditi jer se prosleđuje direktno `AnnotationConfigApplicationContext`-u, ali eksplicitno dodavanje `@Configuration` je good practice i čini nameru jasnijom:
-```java
-@Configuration
-@ComponentScan(basePackages = {"rs.fon.dirandom"})
-public class Ioc { ... }
+@Column(nullable = false)
+private String sifra;
+
 ```
 
-### 5. `MedicalExaminationDto` ne prenosi `opis` kroz konverter
-U `MedicalExaminationConverter.toDto()` i `toEntity()` se ne mapira polje `opis`, iako oba objekta (`MedicalExamination` i `MedicalExaminationDto`) imaju to polje. Treba dodati:
-```java
-m.setOpis(dto.getOpis()); // u toEntity
-m.setOpis(entity.getOpis()); // u toDto
-```
-
----
-
-**Zaključak:** Struktura projekta je solidna, DI je ispravno primenjen, i jasno je da razumeš kako Spring IoC funkcioniše. Ključna greška je u logici `delete` u servisu (uvek baca exception) i izostavljanje `opis` iz konvertera. Sve ostalo su sitne napomene.
+**Kada bi svaki pacijent imao svoj nalog:** Struktura projekta je solidna, DI je ispravno primenjen, i jasno je da razumeš kako Spring IoC funkcioniše. Ključna greška je u logici `delete` u servisu (uvek baca exception) i izostavljanje `opis` iz konvertera. Sve ostalo su sitne napomene.
